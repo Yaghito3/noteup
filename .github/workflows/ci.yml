@@ -5,8 +5,6 @@ on:
 
 jobs:
   build:
-    permissions:
-      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -28,6 +26,11 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Rust Cache
+        uses: [swatinem/rust-cache@v2](https://github.com)
+        with:
+          workspaces: "./src-tauri -> target"
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
@@ -35,17 +38,20 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libssl-dev libayatana-appindicator3-dev librsvg2-dev
 
       - name: install frontend dependencies
-        run: npm install
+        run: npm ci # 'npm ci' è più veloce di 'npm install' in CI
 
-      - name: build and upload artifacts
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: build tauri
+        run: npm run tauri build
+
+      - name: upload artifacts
+        uses: [actions/upload-artifact@v4](https://github.com)
         with:
-          tagName: v__VERSION__
-
-      - name: Log build folders (Debug)
-        shell: bash
-        run: |
-          echo "--- Contenuto cartella bundle ---"
-          ls -R src-tauri/target/release/bundle/ || echo "Cartella non trovata"
+          name: app-build-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/exe/*.exe
+            src-tauri/target/release/bundle/dmg/*.dmg
+            src-tauri/target/release/bundle/macos/*.app
