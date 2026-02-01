@@ -30,7 +30,7 @@ jobs:
         run: npm run tauri build
 
       - name: Upload Artifacts (Linux)
-        uses: [actions/upload-artifact@v4](https://github.com)
+        uses: actions/upload-artifact@v4
         with:
           name: linux-build
           path: |
@@ -58,7 +58,7 @@ jobs:
         run: npm run tauri build
 
       - name: Upload Artifacts (macOS)
-        uses: [actions/upload-artifact@v4](https://github.com)
+        uses: actions/upload-artifact@v4
         with:
           name: macos-build
           path: |
@@ -86,7 +86,7 @@ jobs:
         run: npm run tauri build
 
       - name: Upload Artifacts (Windows)
-        uses: [actions/upload-artifact@v4](https://github.com)
+        uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: |
